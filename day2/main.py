@@ -1,13 +1,7 @@
-from typing import Tuple
-import urllib.request as request
-
 def read_input():
-    file = request.urlopen("https://adventofcode.com/2021/day/2/input")
-    for line in file:
-        print(line)
-    # with open('input.txt', 'r') as file: 
-    #     text = file.read()
-    #     return text
+    with open('input.txt', 'r') as file: 
+        text = file.read()
+        return text
 
 def process_input(text: str):
     steps = [line.split(' ') for line in text.split('\n')]
