@@ -14,13 +14,14 @@ def count_increases(numbers):
 with open("./inputs/day1.txt", "r") as file:
     text = file.read()
     numbers = list(map(lambda x: int(x), text.split("\n")))
+
+    print("--- Part One ---")
+    print(count_increases(numbers))
+
+    print("--- Part Two ---")
     window_values = []
     for i in range(len(numbers) - n_window + 1):
         window = numbers[i : i + n_window]
-        print(window)
         value = sum(numbers[i : i + n_window])
-        print(value)
         window_values.append(value)
-    print("-----------------")
-    print(len(numbers), len(window_values))
     print(count_increases(window_values))

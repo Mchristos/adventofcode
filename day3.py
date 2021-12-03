@@ -10,7 +10,7 @@ def process_input(lines: list[str]):
     return np.array([[int(digit) for digit in line] for line in lines])
 
 
-print("--- Part One ---\n")
+print("--- Part One ---")
 values = process_input(read_input("./inputs/day3.txt"))
 
 
@@ -32,7 +32,7 @@ print("gamma:   ", gamma, binaryarraytoint(gamma))
 print("epsilon: ", epsilon, binaryarraytoint(epsilon))
 print("Solution: ", binaryarraytoint(gamma) * binaryarraytoint(epsilon))
 
-print("--- Part Two ---\n")
+print("--- Part Two ---")
 
 
 def get_oxygen_rating(numbers):
