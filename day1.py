@@ -2,6 +2,7 @@ from helpers import read_input, begin_part_one, begin_part_two, solution
 
 n_window = 3
 
+
 def count_increases(numbers):
     count = 0
     for (i, number) in enumerate(numbers):

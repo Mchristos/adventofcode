@@ -29,6 +29,8 @@ print("epsilon: ", epsilon, binaryarraytoint(epsilon))
 solution(binaryarraytoint(gamma) * binaryarraytoint(epsilon))
 
 begin_part_two()
+
+
 def get_oxygen_rating(numbers):
     i = 0
     while len(numbers) > 1:
