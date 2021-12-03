@@ -6,7 +6,7 @@ def begin_part_two():
     print("--- Part Two ---")
 
 
-def solution(value):
+def solution(value=""):
     print(f"Solution: {value}")
 
 
