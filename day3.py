@@ -1,16 +1,12 @@
 import numpy as np
-
-
-def read_input(path: str) -> list[str]:
-    with open(path, "r") as file:
-        return file.read().split("\n")
+from helpers import read_input, begin_part_one, begin_part_two, solution
 
 
 def process_input(lines: list[str]):
     return np.array([[int(digit) for digit in line] for line in lines])
 
 
-print("--- Part One ---")
+begin_part_one()
 values = process_input(read_input("./inputs/day3.txt"))
 
 
@@ -30,11 +26,9 @@ gamma = compute_gamma(values)
 epsilon = compute_epsilon(values)
 print("gamma:   ", gamma, binaryarraytoint(gamma))
 print("epsilon: ", epsilon, binaryarraytoint(epsilon))
-print("Solution: ", binaryarraytoint(gamma) * binaryarraytoint(epsilon))
+solution(binaryarraytoint(gamma) * binaryarraytoint(epsilon))
 
-print("--- Part Two ---")
-
-
+begin_part_two()
 def get_oxygen_rating(numbers):
     i = 0
     while len(numbers) > 1:
@@ -57,4 +51,4 @@ oxygen_rating = get_oxygen_rating(values)
 scrubber_rating = get_scrubber_rating(values)
 print("oxygen rating: ", oxygen_rating, binaryarraytoint(oxygen_rating))
 print("scrubber rating: ", scrubber_rating, binaryarraytoint(scrubber_rating))
-print("Solution: ", binaryarraytoint(oxygen_rating) * binaryarraytoint(scrubber_rating))
+solution(binaryarraytoint(oxygen_rating) * binaryarraytoint(scrubber_rating))

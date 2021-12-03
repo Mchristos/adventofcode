@@ -1,11 +1,8 @@
-def read_input():
-    with open("./inputs/day2.txt", "r") as file:
-        text = file.read()
-        return text
+from helpers import read_input, begin_part_one, begin_part_two, solution
 
 
-def process_input(text: str):
-    steps = [line.split(" ") for line in text.split("\n")]
+def process_input(input: str):
+    steps = [line.split(" ") for line in input]
     return [(step[0], int(step[1])) for step in steps]
 
 
@@ -41,14 +38,12 @@ def calculate_position_part2(steps: list[tuple[str, int]]):
     return (horizontal, depth, aim)
 
 
-steps = process_input(read_input())
+steps = process_input(read_input("inputs/day2.txt"))
 
-# Part One
+begin_part_one()
 position = calculate_position(steps)
-print(position)
-print(position[0] * position[1])
+solution(position[0] * position[1])
 
-# Part Two
+begin_part_two()
 position = calculate_position_part2(steps)
-print(position)
-print(position[0] * position[1])
+solution(position[0] * position[1])
