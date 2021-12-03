@@ -1,5 +1,5 @@
 def read_input():
-    with open('input.txt', 'r') as file: 
+    with open('../inputs/day2.txt', 'r') as file: 
         text = file.read()
         return text
 

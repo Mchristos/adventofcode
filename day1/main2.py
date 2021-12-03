@@ -9,7 +9,7 @@ def count_increases(numbers):
             count += 1
     return count
 
-with open('input.txt', 'r') as file: 
+with open('../inputs/day1.txt', 'r') as file: 
     text = file.read()
     numbers = list(map(lambda x: int(x), text.split('\n')))
     window_values = []
