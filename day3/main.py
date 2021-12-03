@@ -11,7 +11,7 @@ def process_input(lines: list[str]):
 
 
 print("--- Part One ---\n")
-values = process_input(read_input("../inputs/day3.txt"))
+values = process_input(read_input("./inputs/day3.txt"))
 
 
 def binaryarraytoint(array):
