@@ -21,7 +21,7 @@ def process_input(input: list[str]) -> tuple[list[int], list[np.ndarray]]:
     return (numbers, boards)
 
 
-def is_winning(marked_board: np.ndarray):
+def board_wins(marked_board: np.ndarray):
     column_sums = marked_board.sum(axis=0)
     row_sums = marked_board.sum(axis=1)
     rows, cols = marked_board.shape
@@ -37,29 +37,38 @@ def compute_score(board, marked_board, winning_number):
     return unmarked_sum * winning_number
 
 
-def solve_part2(numbers, boards):
+def solve(numbers, boards):
     marked_boards = [np.zeros((5, 5)) for i in range(len(boards))]
     winning = np.zeros(len(boards))
     lasttowin_index = -1
+    partone = None
+    parttwo = None
     for number in numbers:
         # mark each board with the position of the number
         for (i, board) in enumerate(boards):
             marked_boards[i] += board == number
             # check if board wins
-            if is_winning(marked_boards[i]):
+            if board_wins(marked_boards[i]):
+                if partone == None:
+                    print(f"First winning board won at index {i}")
+                    print(board)
+                    print(marked_boards[i])
+                    partone = compute_score(board, marked_boards[i], number)
                 winning[i] = 1
                 if i == lasttowin_index:
-                    score = compute_score(board, marked_boards[i], number)
-                    return score
+                    print(f"Last winning board won at index {i}")
+                    print(board)
+                    print(marked_boards[i])
+                    parttwo = compute_score(board, marked_boards[i], number)
+                    return (partone, parttwo)
                 if winning.sum() == len(boards) - 1:
                     lasttowin_index = np.where(winning == 0)[0][0]
 
 
 input = read_input("./inputs/day4.txt")
 numbers, boards = process_input(input)
-
+partone, parttwo = solve(numbers, boards)
 begin_part_one()
+solution(partone)
 begin_part_two()
-score = solve_part2(numbers, boards)
-solution(score)
-solution()
+solution(parttwo)
