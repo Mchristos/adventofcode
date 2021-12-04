@@ -24,7 +24,8 @@ def process_input(input: list[str]) -> tuple[list[int], list[np.ndarray]]:
 def is_winning(marked_board: np.ndarray):
     column_sums = marked_board.sum(axis=0)
     row_sums = marked_board.sum(axis=1)
-    return np.any(column_sums == 5) or np.any(row_sums == 5)
+    rows, cols = marked_board.shape
+    return np.any(column_sums == rows) or np.any(row_sums == cols)
 
 
 def compute_score(board, marked_board, winning_number):
@@ -33,30 +34,32 @@ def compute_score(board, marked_board, winning_number):
         for j in range(board.shape[1]):
             if marked_board[i, j] == 0:
                 unmarked_sum += board[i, j]
-    print(unmarked_sum)
-    print(winning_number)
     return unmarked_sum * winning_number
+
+
+def solve_part2(numbers, boards):
+    marked_boards = [np.zeros((5, 5)) for i in range(len(boards))]
+    winning = np.zeros(len(boards))
+    lasttowin_index = -1
+    for number in numbers:
+        # mark each board with the position of the number
+        for (i, board) in enumerate(boards):
+            marked_boards[i] += board == number
+            # check if board wins
+            if is_winning(marked_boards[i]):
+                winning[i] = 1
+                if i == lasttowin_index:
+                    score = compute_score(board, marked_boards[i], number)
+                    return score
+                if winning.sum() == len(boards) - 1:
+                    lasttowin_index = np.where(winning == 0)[0][0]
 
 
 input = read_input("./inputs/day4.txt")
 numbers, boards = process_input(input)
-print(boards)
-print(numbers)
 
 begin_part_one()
-boards_marked = [np.zeros((5, 5)) for i in range(len(boards))]
-for number in numbers:
-    print(number)
-    # mark each board with the position of the number
-    for (i, board) in enumerate(boards):
-        boards_marked[i] += board == number
-        # check if board wins
-        if is_winning(boards_marked[i]):
-            print(f"Winning board found!!")
-            print(board)
-            score = compute_score(board, boards_marked[i], number)
-            solution(score)
-            break
-
 begin_part_two()
+score = solve_part2(numbers, boards)
+solution(score)
 solution()
