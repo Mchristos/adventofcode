@@ -19,30 +19,21 @@ def process_input(inputs: list[str]):
 def solve(lines: list[np.ndarray], diagonals=False):
     grid = np.zeros([n_grid, n_grid])
     for line in lines:
+        (x1, y1), (x2, y2) = line
         # vertical
-        if line[0, 0] == line[1, 0]:
-            x = line[0, 0]
-            miny = min(line[0, 1], line[1, 1])
-            maxy = max(line[0, 1], line[1, 1])
-            for y in range(miny, maxy + 1):
-                grid[x, y] += 1
+        if x1 == x2:
+            grid[x1, min(y1, y2) : max(y1, y2) + 1] += 1
         # horizontal
-        elif line[0, 1] == line[1, 1]:
-            y = line[0, 1]
-            minx = min(line[0, 0], line[1, 0])
-            maxx = max(line[0, 0], line[1, 0])
-            for x in range(minx, maxx + 1):
-                grid[x, y] += 1
+        elif y1 == y2:
+            grid[min(x1, x2) : max(x1, x2) + 1, y1] += 1
         # diagonal
         else:
             if not diagonals:
                 continue
-            x_direction = 1 if line[0, 0] < line[1, 0] else -1
-            y_direction = 1 if line[0, 1] < line[1, 1] else -1
-            for (i, x) in enumerate(
-                range(line[0, 0], line[1, 0] + x_direction, x_direction)
-            ):
-                y = line[0, 1] + i * y_direction
+            dx = 1 if x1 < x2 else -1
+            dy = 1 if y1 < y2 else -1
+            for (i, x) in enumerate(range(x1, x2 + dx, dx)):
+                y = line[0, 1] + i * dy
                 grid[x, y] += 1
     return np.sum(grid >= 2)
 
