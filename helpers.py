@@ -10,6 +10,6 @@ def solution(value=""):
     print(f"Solution: {value}")
 
 
-def read_input(path: str) -> list[str]:
+def read_input(path: str, splitlines=True) -> list[str]:
     with open(path, "r") as file:
-        return file.read().split("\n")
+        return file.read().split("\n") if splitlines else file.read()
