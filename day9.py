@@ -7,6 +7,10 @@ def process_inputs(inputs: list[str]):
 
 
 def get_lowpoints(heights):
+    """
+    Find every point in a 2D array of heights that is lower
+    than all its adjacent points, including points on the edges.
+    """
     rows, cols = heights.shape
     lowpoints = []
     for i in range(rows):
@@ -27,6 +31,10 @@ def get_lowpoints(heights):
 
 
 def expand(point, heights):
+    """
+    For a point in an array of heights, find any adjacent points
+    that are higher than it, excluding the number 9.
+    """
     i, j = point
     rows, cols = heights.shape
     expanded_points = []
@@ -44,6 +52,14 @@ def expand(point, heights):
 
 
 def get_basins(heights):
+    """
+    In a 2D array of heights, compute all "basins", defined as a mutually
+    adjacent set of points that all flow downhill to a single low point,
+    but excluding the number 9 (the highest point).
+
+    Returns an array of basins, where a basin is an array of position
+    indices (i,j) in the heights array.
+    """
     lowpoints = get_lowpoints(heights)
     basins = []
     for lowpoint in lowpoints:
@@ -53,12 +69,10 @@ def get_basins(heights):
             new_basin = basin
             # expand each point in the basin
             for point in basin:
-                print("Expanding: ", point)
                 expanded = expand(point, heights)
                 for expanded_point in expanded:
                     if expanded_point not in basin:
                         new_basin.append(expanded_point)
-            print(new_basin)
             if len(new_basin) == len(basin):
                 break
             else:
@@ -76,6 +90,6 @@ solution()
 begin_part_two()
 basins = get_basins(heightmap)
 basin_sizes = sorted([len(basin) for basin in basins], reverse=True)
-print(basin_sizes)
+print("Basin sizes: ", basin_sizes)
 
 solution(basin_sizes[0] * basin_sizes[1] * basin_sizes[2])
