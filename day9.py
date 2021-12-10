@@ -27,7 +27,6 @@ def get_lowpoints(heights):
                 # print(f"{i, j} is low")
                 lowpoints.append([i, j])
     return lowpoints
-    return np.sum(lowpoints) + len(lowpoints)
 
 
 def expand(point, heights):
@@ -85,8 +84,12 @@ inputs = read_input("./inputs/day9.txt")
 heightmap = process_inputs(inputs)
 print(heightmap)
 
+
 begin_part_one()
-solution()
+lowpoints = get_lowpoints(heightmap)
+solution(np.sum(lowpoints) + len(lowpoints))
+
+
 begin_part_two()
 basins = get_basins(heightmap)
 basin_sizes = sorted([len(basin) for basin in basins], reverse=True)
