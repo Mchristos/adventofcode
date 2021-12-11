@@ -5,9 +5,7 @@ ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 
 def increment_at(password, i):
     new_letter = ALPHABET[(ALPHABET.index(password[i]) + 1) % len(ALPHABET)]
-    new_password = list(password)
-    new_password[i] = new_letter
-    new_password = "".join(new_password)
+    new_password = password[:i] + new_letter + password[i + 1 :]
     if new_letter == "a":
         return increment_at(new_password, i - 1)
     else:
