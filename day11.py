@@ -3,21 +3,13 @@ from helpers import read_input, begin_part_one, begin_part_two, solution
 ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 
 
-def increment_at(password, back_index):
-    if back_index == 1:
-        # next letter
-        i_next = (ALPHABET.index(password[-back_index]) + 1) % len(ALPHABET)
-    else:
-        # next letter IF one place forward just hit "a"
-        if password[-back_index + 1] == "a":
-            i_next = (ALPHABET.index(password[-back_index]) + 1) % len(ALPHABET)
-        else:
-            i_next = ALPHABET.index(password[-back_index]) % len(ALPHABET)
+def increment_at(password, i):
+    new_letter = ALPHABET[(ALPHABET.index(password[i]) + 1) % len(ALPHABET)]
     new_password = list(password)
-    new_password[-back_index] = ALPHABET[i_next]
+    new_password[i] = new_letter
     new_password = "".join(new_password)
-    if i_next == 0:
-        return increment_at(new_password, back_index + 1)
+    if new_letter == "a":
+        return increment_at(new_password, i - 1)
     else:
         return new_password
 
@@ -29,12 +21,11 @@ def force_increment_at(password, index):
     if index < len(password) - 1:
         new_password[index + 1 :] = list("a" * (len(password) - index - 1))
     new_password = "".join(new_password)
-    # print(f"Force increment from {password} to {new_password}")
     return new_password
 
 
 def increment(password):
-    return increment_at(password, 1)
+    return increment_at(password, len(password) - 1)
 
 
 def includes_straight(password: str):
