@@ -77,17 +77,21 @@ def is_valid(password: str):
     )
 
 
-input = "cqjxjnds"
+def solve(input: str):
+    valid = False
+    password = input
+    while not valid:
+        if contains_bad_chars(password):
+            password = force_increment_at(password, find_bad_char(password))
+        else:
+            password = increment(password)
+        valid = is_valid(password)
+    return password
+
 
 begin_part_one()
-valid = False
-password = input
-while not valid:
-    if contains_bad_chars(password):
-        password = force_increment_at(password, find_bad_char(password))
-    else:
-        password = increment(password)
-    valid = is_valid(password)
-solution(password)
+input = "cqjxjnds"
+part1 = solve(input)
+solution(part1)
 begin_part_two()
-solution()
+solution(solve(part1))
