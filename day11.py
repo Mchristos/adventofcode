@@ -45,7 +45,7 @@ print(energies)
 
 begin_part_one()
 flashes = 0
-for step in range(100):
+for step in range(1000):
     # increment
     energies = energies + 1
     # flash
@@ -53,7 +53,11 @@ for step in range(100):
     flashes += flash_count
     # set to 0
     energies[energies > 9] = 0
-print(energies)
+    if np.all(energies == 0):
+        print(energies)
+        print(step + 1)
+        break
+# print(energies)
 solution(flashes)
 
 
