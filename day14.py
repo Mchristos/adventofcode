@@ -1,8 +1,13 @@
 from helpers import read_input, begin_part_one, begin_part_two, solution
 
 
-def count_chars(string: str, char: str):
+def count_occurrences(string: str, char: str):
     return len([char_ for char_ in string if char_ == char])
+
+
+def get_character_counts(polymer: str):
+    unique_chars = set(list(polymer))
+    return {char: count_occurrences(polymer, char) for char in unique_chars}
 
 
 inputs = read_input("./inputs/day14.txt")
@@ -11,7 +16,8 @@ rules = [rule.split(" -> ") for rule in inputs[2:]]
 
 
 begin_part_one()
-for i in range(10):
+print(polymer)
+for i in range(15):
     newpolymer = ""
     for i in range(len(polymer) - 1):
         pair = polymer[i : i + 2]
@@ -22,10 +28,11 @@ for i in range(10):
         else:
             newpolymer = newpolymer + pair[0]
     newpolymer = newpolymer + polymer[-1]
+    print(get_character_counts(newpolymer))
     polymer = newpolymer
 
 unique_chars = set(list(polymer))
-char_counts = [count_chars(polymer, char) for char in unique_chars]
+char_counts = [count_occurrences(polymer, char) for char in unique_chars]
 solution(max(char_counts) - min(char_counts))
 
 
