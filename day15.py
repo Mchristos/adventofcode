@@ -1,3 +1,9 @@
+"""
+Finds the path with least total cost from the top left [0,0]
+to the bottom right of an array of costs. The total cost does 
+not include the cost at [0,0]  
+"""
+
 from helpers import read_input, begin_part_one, begin_part_two, solution
 from functools import reduce
 
