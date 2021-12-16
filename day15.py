@@ -1,8 +1,7 @@
 from helpers import read_input, begin_part_one, begin_part_two, solution
-import numpy as np
-import sys
+from functools import reduce
 
-sys.setrecursionlimit(10000)
+import numpy as np
 
 
 def find_adj(i, length):
@@ -34,34 +33,77 @@ def expand_path(graph, path, visited):
     return [path + [next] for next in new_visits], new_visits
 
 
-def compute_least_path(graph, paths, visited):
-    # expand path with least score
-    scores = [compute_score(graph, path) for path in paths]
-    i_least_path = scores.index(min(scores))
-    least_path = paths[i_least_path]
-    distination = graph.shape
-    if least_path[-1] == [distination[0] - 1, distination[1] - 1]:
-        return least_path
-    else:
-        new_paths, new_visits = expand_path(graph, least_path, visited)
-        return compute_least_path(
-            graph,
-            paths[:i_least_path] + paths[i_least_path + 1 :] + new_paths,
-            visited + new_visits,
-        )
+def print_path(path, shape):
+    picture = np.zeros(shape)
+    for pos in path:
+        picture[tuple(pos)] = 1
+    print(picture)
+
+
+def mad_multiplier(array, axis, times=5, loop=9):
+    """
+    Creates multiple copies of an array, stacked along the given
+    axis (axis = 0 stacks new copies below, axis=1 stacks them to the right).
+    Each is a copy of the original array plus one at each entry, where after
+    9 (loop) you loop back to 1.
+
+    e.g. if array = [[1,2]
+                     [3,4]]
+    Then applying axis=0, times=3 and loop=5 yields
+         [[1,2]
+          [3,4]
+          [2,3]
+          [4,5]
+          [3,4]
+          [5,1]]
+    """
+    return reduce(
+        lambda x, i: (np.concatenate((x, ((array - 1 + i) % loop) + 1), axis=axis)),
+        range(1, times),
+        array,
+    )
 
 
 input = read_input("./inputs/day15.txt")
-risklevel = np.array([[int(x) for x in line] for line in input])
+graph = np.array([[int(x) for x in line] for line in input])
 
 
 begin_part_one()
 paths = [[[0, 0]]]
 visited = [[0, 0]]
-least_path = compute_least_path(risklevel, paths, visited)
-print(least_path)
-solution(sum([risklevel[x[0], x[1]] for x in least_path[1:]]))
+distination = [graph.shape[0] - 1, graph.shape[1] - 1]
+while True:
+    # expand path with least score
+    scores = [compute_score(graph, path) for path in paths]
+    i_least_path = scores.index(min(scores))
+    least_path = paths[i_least_path]
+    if least_path[-1] == distination:
+        break
+    else:
+        new_paths, new_visits = expand_path(graph, least_path, visited)
+        paths = paths[:i_least_path] + paths[i_least_path + 1 :] + new_paths
+        visited += new_visits
+
+print_path(least_path, graph.shape)
+solution(compute_score(graph, least_path[1:]))
 
 
-begin_part_two()
-solution()
+# begin_part_two()
+# meta_dims = [5,5]
+# graph = mad_multiplier(mad_multiplier(graph, axis=0), axis=1)
+# paths = [[[0, 0]]]
+# visited = [[0, 0]]
+# distination = [graph.shape[0] - 1, graph.shape[1] - 1]
+# while True:
+#     # expand path with least score
+#     scores = [compute_score(graph, path) for path in paths]
+#     i_least_path = scores.index(min(scores))
+#     least_path = paths[i_least_path]
+#     if least_path[-1] == distination:
+#         break
+#     else:
+#         new_paths, new_visits = expand_path(graph, least_path, visited)
+#         paths = paths[:i_least_path] + paths[i_least_path + 1 :] + new_paths
+#         visited += new_visits
+# print_path(least_path, graph.shape)
+# solution(compute_score(graph, least_path[1:]))
