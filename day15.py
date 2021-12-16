@@ -88,10 +88,10 @@ def solve(graph):
             graph, paths[i_least_path], scores[i_least_path], visited
         )
         # check for solution found
-        for path in new_paths:
+        for path, score in zip(new_paths, new_scores):
             visited[path[-1]] = True
             if path[-1] == destination:
-                return path
+                return path, score
         # if not expand the set of paths and visits
         paths = paths[:i_least_path] + paths[i_least_path + 1 :] + new_paths
         scores = scores[:i_least_path] + scores[i_least_path + 1 :] + new_scores
@@ -102,27 +102,14 @@ graph = np.array([[int(x) for x in line] for line in input])
 
 
 begin_part_one()
-least_path = solve(graph)
+least_path, score = solve(graph)
 print_path(least_path, graph.shape)
-solution(compute_score(graph, least_path[1:]))
+solution(score)
 
 
-# begin_part_two()
-# meta_dims = [5,5]
-# graph = mad_multiplier(mad_multiplier(graph, axis=0), axis=1)
-# paths = [[[0, 0]]]
-# visited = [[0, 0]]
-# distination = [graph.shape[0] - 1, graph.shape[1] - 1]
-# while True:
-#     # expand path with least score
-#     scores = [compute_score(graph, path) for path in paths]
-#     i_least_path = scores.index(min(scores))
-#     least_path = paths[i_least_path]
-#     if least_path[-1] == distination:
-#         break
-#     else:
-#         new_paths, new_visits = expand_path(graph, least_path, visited)
-#         paths = paths[:i_least_path] + paths[i_least_path + 1 :] + new_paths
-#         visited += new_visits
-# print_path(least_path, graph.shape)
-# solution(compute_score(graph, least_path[1:]))
+begin_part_two()
+meta_dims = [5, 5]
+graph = mad_multiplier(mad_multiplier(graph, axis=0), axis=1)
+least_path, score = solve(graph)
+print_path(least_path, graph.shape)
+solution(score)
