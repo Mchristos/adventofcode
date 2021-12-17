@@ -87,8 +87,7 @@ def solve(graph):
     visited = {(0, 0): True}
     destination = (graph.shape[0] - 1, graph.shape[1] - 1)
     while True:
-        # # expand the least score path
-        # scores = [compute_score(graph, path) for path in paths]
+        # expand the least score path
         i_least_path = scores.index(min(scores))
         new_paths, new_scores = expand_path(
             graph, paths[i_least_path], scores[i_least_path], visited
