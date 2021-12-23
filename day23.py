@@ -11,7 +11,13 @@ from os import stat
 from helpers import begin_part_one, begin_part_two, solution, find_adjacent
 import numpy as np
 
-AMPHIPODS = [11, 22, 33, 44]
+# The value for each amphipod is the x position
+# of its home. For example, the Amber (A) amphipod
+# has its home at x=3, therefore its code value is 3.
+# This is useful when determining if an amphipod is at
+# a home position
+#            A, B, C, D
+AMPHIPODS = [3, 5, 7, 9]
 
 
 def char_to_num(char: str) -> int:
@@ -23,16 +29,16 @@ def char_to_num(char: str) -> int:
         return 0
     # AMBER
     if char == "A":
-        return 11
+        return 3
     # BRONZE
     if char == "B":
-        return 22
+        return 5
     # COPPER
     if char == "C":
-        return 33
+        return 7
     # DESERT
     if char == "D":
-        return 44
+        return 9
     raise Exception(f"Invalid character {char}")
 
 
@@ -63,14 +69,33 @@ def get_legal_adjacents(state: np.ndarray, pos: tuple[int]):
     return next_positions
 
 
-def is_valid_endpoint(state: np.ndarray, pos: tuple[int]):
+def is_safely_home(state: np.ndarray, pos: tuple[int], amphipod: int):
     """
-    A valid ending position for a move is one with walls to the top and bottom
+    Determines if a position is safe for the amphipod to enter as
+    its room
+    """
+    home_positions = [(2, amphipod), (3, amphipod)]
+    return pos in home_positions and all(
+        # home positions must either be empty or have the given amphipod in
+        [
+            (state[home_pos] == 0 or state[home_pos] == amphipod)
+            for home_pos in home_positions
+        ]
+    )
+
+
+def is_valid_endpoint(state: np.ndarray, pos: tuple[int], amphipod: int):
+    """
+    A valid ending position for a move is one with:
+        walls to the top and bottom
+        OR
+        a position in the amphipods room, with no different
+        amphipods in that room already
     """
     return (
         state[pairwise_sum(pos, get_delta("UP"))] == 1
         and state[pairwise_sum(pos, get_delta("DOWN"))] == 1
-    )
+    ) or is_safely_home(state, pos, amphipod)
 
 
 def expand_path(state: np.ndarray, path: list[tuple[int]], visited: list[tuple[int]]):
@@ -101,7 +126,7 @@ def get_legal_moves_from(state: np.ndarray, initial_pos: tuple[int]):
     while True:
         discovered_paths = []
         for path in paths:
-            if is_valid_endpoint(state, path[-1]):
+            if is_valid_endpoint(state, path[-1], path[0]):
                 legal_paths.append(path)
             expanded_paths, new_visits = expand_path(state, path, visited)
             discovered_paths += expanded_paths
