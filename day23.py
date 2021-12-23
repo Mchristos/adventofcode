@@ -19,6 +19,8 @@ import numpy as np
 #            A, B, C, D
 AMPHIPODS = [3, 5, 7, 9]
 
+ENERGY = {3: 1, 5: 10, 7: 100, 9: 1000}
+
 
 def char_to_num(char: str) -> int:
     # Wall
@@ -40,6 +42,9 @@ def char_to_num(char: str) -> int:
     if char == "D":
         return 9
     raise Exception(f"Invalid character {char}")
+
+
+# ___ Getting Legal Moves ___
 
 
 def get_delta(move):
@@ -84,7 +89,7 @@ def is_safely_home(state: np.ndarray, pos: tuple[int], amphipod: int):
     )
 
 
-def is_valid_endpoint(state: np.ndarray, pos: tuple[int], amphipod: int):
+def is_valid_path(state: np.ndarray, path: list[tuple[int]]):
     """
     A valid ending position for a move is one with:
         walls to the top and bottom
@@ -92,8 +97,12 @@ def is_valid_endpoint(state: np.ndarray, pos: tuple[int], amphipod: int):
         a position in the amphipods room, with no different
         amphipods in that room already
     """
+    starts_in_room = path[0][0] >= 2
+    pos = path[-1]
+    amphipod = state[path[0]]
     return (
-        state[pairwise_sum(pos, get_delta("UP"))] == 1
+        starts_in_room
+        and state[pairwise_sum(pos, get_delta("UP"))] == 1
         and state[pairwise_sum(pos, get_delta("DOWN"))] == 1
     ) or is_safely_home(state, pos, amphipod)
 
@@ -126,7 +135,7 @@ def get_legal_moves_from(state: np.ndarray, initial_pos: tuple[int]):
     while True:
         discovered_paths = []
         for path in paths:
-            if is_valid_endpoint(state, path[-1], path[0]):
+            if is_valid_path(state, path):
                 legal_paths.append(path)
             expanded_paths, new_visits = expand_path(state, path, visited)
             discovered_paths += expanded_paths
@@ -146,6 +155,42 @@ def get_legal_moves(state: np.ndarray):
     return moves
 
 
+# ___ Updating State and Pathfinding ___
+
+
+def compute_energy(state, move: list[tuple[int]]):
+    return ENERGY[state[move[0]]] * len(move)
+
+
+def update_state(state: np.ndarray, move: list[tuple[int]], energy: int):
+    new_state = np.array(state)
+    new_state[move[-1]] = state[move[0]]
+    new_state[move[0]] = 0
+    return (new_state, energy + compute_energy(state, move))
+
+
+def expand(state: np.ndarray, energy: int):
+    moves = get_legal_moves(state)
+    return [update_state(state, move, energy) for move in moves]
+
+
+def solve(energy_states):
+    while True:
+        # expand state with least energy
+        states, energies = zip(*energy_states)
+        i_least_energy = energies.index(min(energies))
+        new_energy_states = expand(states[i_least_energy], energies[i_least_energy])
+        # check for valid solution
+        for state, energy in new_energy_states:
+            if np.all(state == winning_state):
+                return state, energy
+        energy_states = (
+            energy_states[:i_least_energy]
+            + energy_states[i_least_energy + 1 :]
+            + new_energy_states
+        )
+
+
 with open("./inputs/day23.txt", "r") as file:
     lines = file.read().split("\n")
 
@@ -156,15 +201,21 @@ with open("./inputs/day23.txt", "r") as file:
 initial_state = np.array(
     [np.array([char_to_num(char) for char in line]) for line in lines]
 )
-
-
 print(initial_state)
 
+winning_state = np.array(initial_state)
+for amphipod in AMPHIPODS:
+    winning_state[2, amphipod] = amphipod
+    winning_state[3, amphipod] = amphipod
+
+
+print(winning_state)
+
 begin_part_one()
-moves = get_legal_moves(initial_state)
-for move in moves:
-    print(move)
-solution()
+energy_states = [(initial_state, 0)]
+final_state, final_energy = solve(energy_states)
+print(final_energy)
+solution(final_energy)
 
 begin_part_two()
 solution()
