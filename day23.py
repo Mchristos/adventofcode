@@ -10,6 +10,7 @@ satisfies:
 from os import stat
 from helpers import begin_part_one, begin_part_two, solution, find_adjacent
 import numpy as np
+import random
 
 # The value for each amphipod is the x position
 # of its home. For example, the Amber (A) amphipod
@@ -162,36 +163,78 @@ def compute_energy(state, move: list[tuple[int]]):
     return ENERGY[state[move[0]]] * len(move)
 
 
-def update_state(state: np.ndarray, move: list[tuple[int]], energy: int):
+def compute_heuristic_cost(state):
+    result = 0
+    for i in range(state.shape[0]):
+        for j in range(state.shape[1]):
+            if state[i, j] in AMPHIPODS:
+                amphipod = state[i, j]
+                # amphipod 3 belongs in columns 3, so add a cost of the absolute distance
+                result += abs(j - amphipod)
+    return result
+
+
+def update_state(
+    state: np.ndarray, move: list[tuple[int]], energy: int, heuristic: int
+):
+    """
+    Updates the state of the world for the given move, and also updates the
+    current energy and heuristic values
+    """
     new_state = np.array(state)
-    new_state[move[-1]] = state[move[0]]
+    amphipod = state[move[0]]
+    if amphipod not in AMPHIPODS:
+        raise Exception("Invalid move found for state.")
+    new_state[move[-1]] = amphipod
     new_state[move[0]] = 0
-    return (new_state, energy + compute_energy(state, move))
+    energy_cost = compute_energy(state, move)
+    heuristic_cost = compute_heuristic_cost(new_state)
+    return (new_state, energy + energy_cost, energy + energy_cost + heuristic_cost)
 
 
-def expand(state: np.ndarray, energy: int):
+def expand(state: np.ndarray, energy: int, heuristic: int, visited: list[np.ndarray]):
     moves = get_legal_moves(state)
-    return [update_state(state, move, energy) for move in moves]
+    next_states = [update_state(state, move, energy, heuristic) for move in moves]
+    return [
+        state
+        for state in next_states
+        if not any([np.all(state == visit) for visit in visited])
+    ]
 
 
-def solve(energy_states):
-    while True:
+def indices(iterable, value):
+    return [i for (i, val) in enumerate(iterable) if val == value]
+
+
+def solve(initial_state):
+    solutions = [(initial_state, 0, 0)]
+    visited = [initial_state]
+    for i in range(1000):
         # expand state with least energy
-        states, energies = zip(*energy_states)
-        i_least_energy = energies.index(min(energies))
-        new_energy_states = expand(states[i_least_energy], energies[i_least_energy])
-        # check for valid solution
-        for state, energy in new_energy_states:
-            if np.all(state == winning_state):
-                return state, energy
-        energy_states = (
-            energy_states[:i_least_energy]
-            + energy_states[i_least_energy + 1 :]
-            + new_energy_states
+        states, energies, heuristics = zip(*solutions)
+        least_indices = indices(heuristics, min(heuristics))
+        i_least_heuristic = least_indices[random.randint(0, len(least_indices) - 1)]
+        if np.all(states[i_least_heuristic] == winning_state):
+            return states[i_least_heuristic], energies[i_least_heuristic]
+        new_solutions = expand(
+            states[i_least_heuristic],
+            energies[i_least_heuristic],
+            heuristics[i_least_heuristic],
+            visited,
         )
+        solutions = (
+            solutions[:i_least_heuristic]
+            + solutions[i_least_heuristic + 1 :]
+            + new_solutions
+        )
+        # print(states[i_least_heuristic],
+        # energies[i_least_heuristic],
+        # heuristics[i_least_heuristic],
+        # )
+    return states[i_least_heuristic], energies[i_least_heuristic]
 
 
-with open("./inputs/day23.txt", "r") as file:
+with open("./inputs/day23_.txt", "r") as file:
     lines = file.read().split("\n")
 
 # Define a "move"
@@ -212,9 +255,9 @@ for amphipod in AMPHIPODS:
 print(winning_state)
 
 begin_part_one()
-energy_states = [(initial_state, 0)]
-final_state, final_energy = solve(energy_states)
-print(final_energy)
+
+final_state, final_energy = solve(initial_state)
+print(final_state)
 solution(final_energy)
 
 begin_part_two()
