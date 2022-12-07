@@ -16,27 +16,39 @@ class Dir:
     def __repr__(self):
         return self.path
 
-    def get_dirsize(self):
+    def get_size(self):
+        """
+        Return the size of the directory, i.e. the sum of all the files 
+        and directories contained in the directory. 
+        """
         if self._dirsize:
             return self._dirsize
         size = 0
         for file in self.files:
             size += int(file[0])
         for dir in self.subdirs:
-            size += dir.get_dirsize()
+            size += dir.get_size()
         self._dirsize = size
         return size
 
     def r_get_sizes(self, sizes=[]):
-        sizes = sizes + [(self.name, self.get_dirsize())]
+        """
+        Get the size of the directory and all subdirectories recursively
+
+        Returns a list of sizes tupled with the dir path 
+        """
+        sizes = sizes + [(self.path, self.get_size())]
         for dir in self.subdirs:
             sizes = dir.r_get_sizes(sizes)
         return sizes
 
-    def r_get_dirs(self, result=[]):
+    def r_get_subdirs(self, result=[]):
+        """
+        Recursively get all subdirectories under this directory
+        """
         for dir in self.subdirs:
             result = result + [dir]
-            result = dir.r_get_dirs(result)
+            result = dir.r_get_subdirs(result)
         return result
 
 
@@ -75,7 +87,8 @@ with open("2022/inputs/day7.txt", "r") as f:
 
     result = 0
     sizes = root.r_get_sizes()
-    for name, size in sizes:
+    for path, size in sizes:
+        # print(path, size)
         if size <= 100000:
             result += size
     print("part 1")
@@ -84,10 +97,10 @@ with open("2022/inputs/day7.txt", "r") as f:
     total_space = 70000000
     required_free = 30000000
 
-    free = total_space - root.get_dirsize()
+    free = total_space - root.get_size()
     candidates = []
-    for dir in root.r_get_dirs():
-        size = dir.get_dirsize()
+    for dir in root.r_get_subdirs():
+        size = dir.get_size()
         if free + size > required_free:
             candidates.append(size)
     print("\npart 2")
