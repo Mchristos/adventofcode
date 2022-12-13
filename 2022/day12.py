@@ -3,7 +3,7 @@ import numpy as np
 letters = 'abcdefghijklmnopqrstuvwxyz'
 
 
-with open('2022/inputs/day12_.txt', 'r') as f:
+with open('2022/inputs/day12.txt', 'r') as f:
     lines = f.read().split('\n')
     print(lines)
     lines_ = []
@@ -49,32 +49,54 @@ with open('2022/inputs/day12_.txt', 'r') as f:
     def dist(A, B):
         return abs(A[0] - B[0]) + abs(A[1] - B[1])
 
-    paths = [[S]]
-    print(grid.shape)
-    print(grid[S],grid[E])
-    dists = [dist(path[-1], E) for path in paths]
-    min_dist = min(dists)
-    i_nearest = dists.index(min_dist)
-    while not min_dist == 0:
-        # print(i_nearest)
-        new_paths = expand(paths[i_nearest])
-        new_dists = [dist(path[-1], E) for path in new_paths]
-        if len(new_paths) > 0:
-            paths.pop(i_nearest)
-            dists.pop(i_nearest)
-            paths += new_paths
-            dists += new_dists
-            new_min = min(new_dists) 
-            if new_min < min_dist:
-                i_nearest = dists.index(new_min)
-                min_dist = new_min
-            # print(len(paths))
+    def find(pos, path=[], visited=set()):
+        # print(pos, path, visited)
+        path.append(pos)
+        visited.add(pos)
+        if pos == E:
+            return (True, path)
+        moves = legal_moves(pos)
+        leastpath = None
+        for child in moves:
+            if child not in visited:
+                found, path_ = find(child, path, visited)
+                if found and (leastpath is None or len(path_) < len(leastpath)):
+                    leastpath = path_
+        if leastpath:
+            return (True, leastpath)
         else:
-            # print("can't expand", paths[i_nearest])
-            paths.pop(i_nearest)
-            dists.pop(i_nearest)
-            min_dist = min(dists)
-            i_nearest = dists.index(min_dist)
-    winner = paths[i_nearest]
-    print(winner)
-    print(len(winner) - 1)
+            return (False, path)
+        
+
+    path = find(S)
+    print(path)
+
+    # paths = [[S]]
+    # print(grid.shape)
+    # print(grid[S],grid[E])
+    # dists = [dist(path[-1], E) for path in paths]
+    # min_dist = min(dists)
+    # i_nearest = dists.index(min_dist)
+    # while not min_dist == 0:
+    #     # print(i_nearest)
+    #     new_paths = expand(paths[i_nearest])
+    #     new_dists = [dist(path[-1], E) for path in new_paths]
+    #     if len(new_paths) > 0:
+    #         paths.pop(i_nearest)
+    #         dists.pop(i_nearest)
+    #         paths += new_paths
+    #         dists += new_dists
+    #         new_min = min(new_dists) 
+    #         if new_min < min_dist:
+    #             i_nearest = dists.index(new_min)
+    #             min_dist = new_min
+    #         # print(len(paths))
+    #     else:
+    #         # print("can't expand", paths[i_nearest])
+    #         paths.pop(i_nearest)
+    #         dists.pop(i_nearest)
+    #         min_dist = min(dists)
+    #         i_nearest = dists.index(min_dist)
+    # winner = paths[i_nearest]
+    # print(winner)
+    # print(len(winner) - 1)
