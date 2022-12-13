@@ -1,4 +1,7 @@
 import numpy as np 
+import sys
+print(sys.getrecursionlimit())
+sys.setrecursionlimit(5000)
 
 letters = 'abcdefghijklmnopqrstuvwxyz'
 
@@ -49,27 +52,32 @@ with open('2022/inputs/day12.txt', 'r') as f:
     def dist(A, B):
         return abs(A[0] - B[0]) + abs(A[1] - B[1])
 
-    def find(pos, path=[], visited=set()):
+    def find(pos, path_=[], visited_=set()):
         # print(pos, path, visited)
+        path = path_.copy()
         path.append(pos)
+        visited = visited_.copy()
         visited.add(pos)
         if pos == E:
+            # print("found!", path)
             return (True, path)
-        moves = legal_moves(pos)
         leastpath = None
-        for child in moves:
+        for child in legal_moves(pos):
             if child not in visited:
-                found, path_ = find(child, path, visited)
-                if found and (leastpath is None or len(path_) < len(leastpath)):
-                    leastpath = path_
+                found, childpath = find(child, path, visited)
+                if found:
+                    if not leastpath:
+                        leastpath = childpath
+                    leastpath = min(childpath, leastpath)
         if leastpath:
             return (True, leastpath)
         else:
             return (False, path)
         
 
-    path = find(S)
+    found, path = find(S)
     print(path)
+    print(len(path) - 1)
 
     # paths = [[S]]
     # print(grid.shape)
