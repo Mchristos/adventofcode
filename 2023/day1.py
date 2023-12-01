@@ -10,6 +10,15 @@ def isint(x):
 
 digits = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 
+def get_last_word_idx(word, line):
+    i = line.index(word)
+    new_line = line[:i] + line[i + len(word):]
+    if word in new_line:
+        return len(word) + get_last_word_idx(word, new_line)
+    else:
+        return i
+    
+
 
 def get_first(line):
     first = None
@@ -25,33 +34,36 @@ def get_first(line):
             if k is None or j < k:
                 k = j
                 first = str(d + 1)
-    return first 
+    assert first is not None
+    return first
 
 def get_last(line):
-    first = None
+    last = None
     k = None
     for i, c in enumerate(reversed(line)):
         if isint(c):
-            first = c
+            last = c
             k = i
             break
-
     if k is not None:
         k = len(line) - 1 - k
+
     for d, dig in enumerate(digits):
         if dig in line:
-            j = line.index(dig)
+            j = get_last_word_idx(dig, line)
             if k is None or j > k:
                 k = j
-                first = str(d + 1)
-    return first 
+                last = str(d + 1)
+    assert last is not None
+    return last 
 
 
-sum = 0 
+sum = 0
+
 for line in lines:
     first = get_first(line)
     last = get_last(line)
-    print(first, last)
+    # print(line, first, last)
     digit = int(first + last)
     sum += digit
 
